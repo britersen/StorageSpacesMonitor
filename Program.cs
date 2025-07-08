@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Management;
@@ -6,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Timers;
 using System.Windows.Forms;
-
 
 namespace StorageSpacesMonitor
 {
@@ -22,6 +22,22 @@ namespace StorageSpacesMonitor
         [STAThread]
         static void Main()
         {
+            // Terminate other running instances of this application
+            try
+            {
+                string currentProcessName = Process.GetCurrentProcess().ProcessName;
+                int currentProcessId = Process.GetCurrentProcess().Id;
+                foreach (var process in Process.GetProcessesByName(currentProcessName))
+                {
+                    if (process.Id != currentProcessId)
+                    {
+                        try { process.Kill(); }
+                        catch { /* Ignore if cannot kill */ }
+                    }
+                }
+            }
+            catch { /* Ignore any errors during termination */ }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -33,7 +49,15 @@ namespace StorageSpacesMonitor
             };
 
             var contextMenu = new ContextMenuStrip();
-            contextMenu.Items.Add("Exit", null, (s, e) => Application.Exit());
+            contextMenu.Items.Add("Exit", null, (s, e) =>
+            {
+                // Clean up resources
+                updateTimer?.Stop();
+                updateTimer?.Dispose();
+                trayIcon.Visible = false;
+                trayIcon.Dispose();
+                Application.Exit();
+            });
             trayIcon.ContextMenuStrip = contextMenu;
 
             trayIcon.MouseClick += TrayIcon_MouseClick;
