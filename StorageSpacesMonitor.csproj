@@ -29,7 +29,7 @@
     <Version>1.0.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <InformationalVersion>1.0.0 Release</InformationalVersion>
+    <InformationalVersion>v1.0.0-Release</InformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup>
